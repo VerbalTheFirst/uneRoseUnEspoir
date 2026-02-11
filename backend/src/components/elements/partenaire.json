@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_elements_partenaires",
+  "info": {
+    "displayName": "Partenaire",
+    "icon": "handshake"
+  },
+  "options": {},
+  "attributes": {
+    "nom": {
+      "type": "string",
+      "required": true
+    },
+    "logo": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "url": {
+      "type": "string"
+    }
+  }
+}

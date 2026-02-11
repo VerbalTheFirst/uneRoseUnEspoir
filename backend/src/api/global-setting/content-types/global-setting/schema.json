@@ -1,0 +1,32 @@
+{
+  "kind": "singleType",
+  "collectionName": "global_settings",
+  "info": {
+    "singularName": "global-setting",
+    "pluralName": "global-settings",
+    "displayName": "Global Settings",
+    "description": "Paramètres globaux du site"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "logo": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "contact_email": {
+      "type": "email"
+    },
+    "reseaux_sociaux": {
+      "type": "component",
+      "repeatable": true,
+      "component": "elements.social-link"
+    },
+    "liens_ligue": {
+      "type": "text"
+    }
+  }
+}

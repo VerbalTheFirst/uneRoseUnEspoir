@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_elements_social_links",
+  "info": {
+    "displayName": "Lien Social",
+    "icon": "twitter"
+  },
+  "options": {},
+  "attributes": {
+    "nom": {
+      "type": "string",
+      "required": true
+    },
+    "url": {
+      "type": "string",
+      "required": true
+    },
+    "icone": {
+      "type": "enumeration",
+      "enum": ["facebook", "instagram", "twitter", "linkedin", "youtube"],
+      "default": "facebook"
+    }
+  }
+}

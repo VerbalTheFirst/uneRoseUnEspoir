@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "galeries",
+  "info": {
+    "singularName": "galerie",
+    "pluralName": "galeries",
+    "displayName": "Galerie",
+    "description": "Galeries photos"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "titre": {
+      "type": "string",
+      "required": true
+    },
+    "edition": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::edition.edition",
+      "inversedBy": "galeries"
+    },
+    "medias": {
+      "type": "media",
+      "multiple": true,
+      "required": true,
+      "allowedTypes": ["images", "videos"]
+    }
+  }
+}
