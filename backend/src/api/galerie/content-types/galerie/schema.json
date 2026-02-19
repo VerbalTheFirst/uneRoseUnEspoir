@@ -25,8 +25,12 @@
     "medias": {
       "type": "media",
       "multiple": true,
-      "required": true,
+      "required": false,
       "allowedTypes": ["images", "videos"]
+    },
+    "youtube_urls": {
+      "type": "json",
+      "required": false
     }
   }
 }

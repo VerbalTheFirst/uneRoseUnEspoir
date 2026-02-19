@@ -1,43 +1,52 @@
-# Astro Starter Kit: Minimal
+# Frontend — Astro v5
 
-```sh
-npm create astro@latest -- --template minimal
+Site vitrine Une Rose Un Espoir, construit avec Astro v5 et Tailwind CSS v4.
+
+## Commandes
+
+```bash
+npm run dev       # Dev server (port 4321)
+npm run build     # Build de production
+npm run preview   # Prévisualiser le build
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Configuration
 
-## 🚀 Project Structure
+Créer un fichier `.env` à la racine du dossier `frontend/` :
 
-Inside of your Astro project, you'll see the following folders and files:
+```env
+# URL du backend Strapi
+STRAPI_URL=http://localhost:1337
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+# Contact form (Resend)
+# Clé API : https://resend.com/api-keys
+RESEND_API_KEY=re_xxxxxxxxxxxxx
+# Email de réception des messages
+CONTACT_EMAIL=votre@email.com
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Pages
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+| Route | Fichier | Rendu | Description |
+|---|---|---|---|
+| `/` | `index.astro` | SSG | Accueil, édition en cours, articles récents |
+| `/association` | `association.astro` | SSG | Présentation |
+| `/action` | `action.astro` | SSG | L'action caritative |
+| `/actualites` | `actualites/index.astro` | SSG | Liste des articles |
+| `/actualites/[slug]` | `actualites/[slug].astro` | SSR | Détail article avec contenu riche |
+| `/galeries` | `galeries.astro` | SSG | Photos + vidéos avec lightbox |
+| `/secteurs` | `secteurs.astro` | SSG | Zones couvertes |
+| `/contact` | `contact.astro` | SSG | Formulaire de contact |
+| `/api/contact` | `api/contact.ts` | SSR | Endpoint POST envoi email |
 
-Any static assets, like images, can be placed in the `public/` directory.
+## Librairies internes
 
-## 🧞 Commands
+- **`lib/strapi.ts`** : Client pour l'API REST Strapi
+- **`lib/helpers.ts`** : Utilitaires partagés (`getImageUrl`, `formatDate`, `blocksToText`)
+- **`lib/blocks-renderer.ts`** : Convertit le format Blocks de Strapi en HTML (gras, liens, titres, listes, citations, images, code)
 
-All commands are run from the root of the project, from a terminal:
+## Notes techniques
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+- **Pas de React côté client** : toutes les interactions (lightbox, formulaire) utilisent du vanilla JS pour éviter les problèmes d'hydratation et réduire le bundle
+- **Tailwind CSS v4** avec le plugin `@tailwindcss/typography` pour le styling du contenu riche (classe `prose`)
+- **Fallback offline** : si Strapi n'est pas joignable, les pages affichent un message d'erreur plutôt que de crasher

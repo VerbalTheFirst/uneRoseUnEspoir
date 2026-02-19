@@ -1,20 +1,73 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+// SSR: rendered on each request so new CMS content appears instantly
+export const prerender = false;
 
-export function getStaticPaths() {
-  return [
-    {params: {slug: 'exemple-article'}},
-  ];
-}
+import Layout from '../../layouts/Layout.astro';
+import fetchApi from '../../lib/strapi';
+import { getImageUrl, formatDate } from '../../lib/helpers';
+import { renderBlocks } from '../../lib/blocks-renderer';
 
 const { slug } = Astro.params;
+
+// Fetch the specific article by slug
+let article: any = null;
+try {
+  const articles = await fetchApi<any[]>({
+    endpoint: 'articles',
+    query: {
+      'filters[slug][$eq]': slug!,
+      'populate': '*',
+    },
+    wrappedByKey: 'data',
+  });
+  if (articles && articles.length > 0) {
+    article = articles[0];
+  }
+} catch (e) {
+  console.warn(`Could not fetch article with slug: ${slug}`);
+}
+
+// 404 if article not found
+if (!article) {
+  return Astro.redirect('/actualites');
+}
+
+const imageUrl = getImageUrl(article.image);
+const contentHtml = renderBlocks(article.contenu);
 ---
 
-<Layout title={`Article ${slug} - Une Rose Un Espoir`}>
-  <div class="container mx-auto px-4 py-12">
-    <h1 class="text-4xl font-bold font-heading mb-4">Détail de l'article {slug}</h1>
-    <div class="prose max-w-none">
-      <p>Contenu de l'article...</p>
+<Layout title={`${article.titre} - Une Rose Un Espoir`}>
+  <article>
+    <!-- Back link -->
+    <div class="container mx-auto px-4 pt-8">
+      <a href="/actualites" class="text-rose-600 hover:underline inline-block">&larr; Retour aux actualités</a>
     </div>
-  </div>
+
+    <!-- Banner image -->
+    {imageUrl && (
+      <div class="w-full h-64 md:h-96 mt-6 overflow-hidden">
+        <img
+          src={imageUrl}
+          alt={article.titre}
+          class="w-full h-full object-cover"
+        />
+      </div>
+    )}
+
+    <div class="container mx-auto px-4 py-8 max-w-3xl">
+      <!-- Category + Date -->
+      <div class="mb-4">
+        <span class="text-xs font-bold text-rose-600 uppercase tracking-wider">{article.categorie ?? 'Actualité'}</span>
+        {article.date && (
+          <span class="text-sm text-gray-400 ml-4">{formatDate(article.date)}</span>
+        )}
+      </div>
+
+      <!-- Title -->
+      <h1 class="text-4xl font-bold font-heading mb-8">{article.titre}</h1>
+
+      <!-- Content (Rich Blocks renderer) -->
+      <div class="prose prose-lg max-w-none" set:html={contentHtml || '<p class="text-gray-500">Pas de contenu pour cet article.</p>'} />
+    </div>
+  </article>
 </Layout>
