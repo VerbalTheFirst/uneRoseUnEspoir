@@ -1,61 +1,50 @@
-# 🚀 Getting started with Strapi
+# Backend — Strapi v5
 
-Strapi comes with a full featured [Command Line Interface](https://docs.strapi.io/dev-docs/cli) (CLI) which lets you scaffold and manage your project in seconds.
+CMS Headless pour la gestion du contenu du site Une Rose Un Espoir.
 
-### `develop`
+## Commandes
 
-Start your Strapi application with autoReload enabled. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-develop)
-
-```
-npm run develop
-# or
-yarn develop
+```bash
+npm run develop   # Dev avec auto-reload (port 1337)
+npm run start     # Production
+npm run build     # Build du panneau admin
 ```
 
-### `start`
+## Données de démo (Seed)
 
-Start your Strapi application with autoReload disabled. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-start)
+Pour pré-remplir la base avec des données réalistes :
 
-```
-npm run start
-# or
-yarn start
+```bash
+SEED=true npm run develop
 ```
 
-### `build`
+Le seed crée **1 édition**, **3 articles** (avec contenu riche) et **1 galerie** si la base est vide. Il ne s'exécute qu'une fois.
 
-Build your admin panel. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-build)
+## Configuration
 
-```
-npm run build
-# or
-yarn build
-```
+### Variables d'environnement (optionnelles)
 
-## ⚙️ Deployment
+| Variable | Description | Défaut |
+|---|---|---|
+| `DATABASE_CLIENT` | `sqlite` ou `postgres` | `sqlite` |
+| `DATABASE_URL` | URL PostgreSQL (prod) | — |
+| `CLOUDINARY_NAME` | Nom du cloud Cloudinary | — (uploads locaux) |
+| `CLOUDINARY_KEY` | Clé API Cloudinary | — |
+| `CLOUDINARY_SECRET` | Secret Cloudinary | — |
 
-Strapi gives you many possible deployment options for your project including [Strapi Cloud](https://cloud.strapi.io). Browse the [deployment section of the documentation](https://docs.strapi.io/dev-docs/deployment) to find the best solution for your use case.
+> Cloudinary n'est activé que si `CLOUDINARY_NAME` est défini. En dev, les uploads sont stockés localement dans `public/uploads/`.
 
-```
-yarn strapi deploy
-```
+## Permissions API (après premier lancement)
 
-## 📚 Learn more
+Dans l'admin (`http://localhost:1337/admin`) :
 
-- [Resource center](https://strapi.io/resource-center) - Strapi resource center.
-- [Strapi documentation](https://docs.strapi.io) - Official Strapi documentation.
-- [Strapi tutorials](https://strapi.io/tutorials) - List of tutorials made by the core team and the community.
-- [Strapi blog](https://strapi.io/blog) - Official Strapi blog containing articles made by the Strapi team and the community.
-- [Changelog](https://strapi.io/changelog) - Find out about the Strapi product updates, new features and general improvements.
+1. Settings → Users & Permissions → Roles → **Public**
+2. Cocher `find` et `findOne` pour : **Edition**, **Article**, **Galerie**
+3. Sauvegarder
 
-Feel free to check out the [Strapi GitHub repository](https://github.com/strapi/strapi). Your feedback and contributions are welcome!
+## Content Types
 
-## ✨ Community
-
-- [Discord](https://discord.strapi.io) - Come chat with the Strapi community including the core team.
-- [Forum](https://forum.strapi.io/) - Place to discuss, ask questions and find answers, show your Strapi project and get feedback or just talk with other Community members.
-- [Awesome Strapi](https://github.com/strapi/awesome-strapi) - A curated list of awesome things related to Strapi.
-
----
-
-<sub>🤫 Psst! [Strapi is hiring](https://strapi.io/careers).</sub>
+- **Edition** : Année, date, montant collecté, description (Blocks), affiche, partenaires
+- **Article** : Titre, slug, contenu riche (Blocks), image, date, catégorie
+- **Galerie** : Titre, médias (images multiples), URLs YouTube
+- **Page** : Réservé pour pages dynamiques futures
