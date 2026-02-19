@@ -1,81 +1,185 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import fetchApi from '../lib/strapi';
+import { getImageUrl, formatDate, blocksToText } from '../lib/helpers';
 
-let articles = [];
+// ---------- Data fetching ----------
+
+let articles: any[] = [];
+let edition: any = null;
+let strapiOnline = true;
+
 try {
-  // Example fetch, assuming 'articles' endpoint exists and is public
-  // articles = await fetchApi<any[]>({ endpoint: 'articles', wrappedByKey: 'data' });
+  articles = await fetchApi<any[]>({
+    endpoint: 'articles',
+    query: {
+      'sort': 'date:desc',
+      'pagination[limit]': '3',
+      'populate': '*',
+    },
+    wrappedByKey: 'data',
+  }) ?? [];
 } catch (e) {
-  console.log('Strapi offline or not reachable, using placeholders.');
+  strapiOnline = false;
 }
+
+try {
+  // Direct fetch with deep populate for partenaires.logo (nested component media)
+  const strapiUrl = import.meta.env.STRAPI_URL || 'http://localhost:1337';
+  const editionUrl = `${strapiUrl}/api/editions?sort=annee:desc&pagination[limit]=1&populate[affiche]=true&populate[partenaires][populate][logo]=true`;
+  const res = await fetch(editionUrl);
+  const json = await res.json();
+  if (json.data && json.data.length > 0) {
+    edition = json.data[0];
+  }
+} catch (e) {
+  console.error('Edition fetch error:', e);
+  strapiOnline = false;
+}
+
+
 ---
 
 <Layout title="Une Rose Un Espoir - Accueil">
-  <!-- Hero Section -->
+
+  {/* ────────── HERO ────────── */}
   <section class="relative bg-rose-600 text-white overflow-hidden">
-    <div class="absolute inset-0 bg-black/20"></div>
-    <div class="container mx-auto px-4 py-24 relative z-10 text-center">
+    <div class="absolute inset-0 bg-gradient-to-br from-rose-700 to-rose-500"></div>
+    <div class="container mx-auto px-4 py-28 relative z-10 text-center">
       <h1 class="text-4xl md:text-6xl font-bold font-heading mb-6">
         Une Rose, Un Espoir
       </h1>
-      <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto">
-        Les motards s'unissent contre le cancer. Rejoignez-nous pour la prochaine édition.
+      <p class="text-xl md:text-2xl mb-10 max-w-2xl mx-auto opacity-90">
+        Les motards s'unissent contre le cancer.<br />
+        Rejoignez-nous pour la prochaine édition.
       </p>
-      <a href="/action" class="inline-block bg-white text-rose-600 font-bold py-3 px-8 rounded-full hover:bg-gray-100 transition-colors">
-        En savoir plus
-      </a>
-    </div>
-  </section>
-
-  <!-- Edition Courante Teaser (Static placeholder for now) -->
-  <section class="py-16 bg-white">
-    <div class="container mx-auto px-4">
-      <div class="flex flex-col md:flex-row items-center gap-12">
-        <div class="md:w-1/2">
-          <div class="bg-gray-200 aspect-[3/4] rounded-lg flex items-center justify-center text-gray-500">
-            Affiche Edition (Placeholder)
-          </div>
-        </div>
-        <div class="md:w-1/2">
-          <h2 class="text-3xl font-bold font-heading mb-4 text-gray-800">Prochaine Édition 2026</h2>
-          <p class="text-lg text-gray-600 mb-6">
-            Préparez-vous pour un week-end de solidarité et de partage. Nos motards sillonneront les routes pour collecter des dons contre une rose.
-          </p>
-          <div class="flex gap-4">
-            <div class="bg-rose-50 p-4 rounded-lg text-center min-w-[100px]">
-              <span class="block text-2xl font-bold text-rose-600">25</span>
-              <span class="text-sm text-gray-600">Avril</span>
-            </div>
-            <div class="bg-rose-50 p-4 rounded-lg text-center min-w-[100px]">
-              <span class="block text-2xl font-bold text-rose-600">26</span>
-              <span class="text-sm text-gray-600">Avril</span>
-            </div>
-          </div>
-        </div>
+      <div class="flex flex-wrap gap-4 justify-center">
+        <a href="/action" class="inline-block bg-white text-rose-600 font-bold py-3 px-8 rounded-full hover:bg-gray-100 transition-colors">
+          Découvrir l'action
+        </a>
+        <a href="/galeries" class="inline-block border-2 border-white text-white font-bold py-3 px-8 rounded-full hover:bg-white/10 transition-colors">
+          📸 Voir la galerie
+        </a>
       </div>
     </div>
   </section>
 
-  <!-- Dernières Actualités (Placeholder) -->
+  {/* ────────── EDITION COURANTE ────────── */}
+  <section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      {edition ? (
+        <div class="flex flex-col md:flex-row items-center gap-12">
+          {/* Affiche */}
+          <div class="md:w-5/12">
+            {getImageUrl(edition.affiche) ? (
+              <img
+                src={getImageUrl(edition.affiche)!}
+                alt={`Affiche édition ${edition.annee}`}
+                class="rounded-lg shadow-lg w-full max-w-md mx-auto"
+              />
+            ) : (
+              <div class="bg-gray-100 aspect-[3/4] rounded-lg flex items-center justify-center text-gray-400 max-w-md mx-auto">
+                <span class="text-6xl">🌹</span>
+              </div>
+            )}
+          </div>
+          {/* Infos */}
+          <div class="md:w-7/12">
+            <span class="text-xs font-bold text-rose-600 uppercase tracking-wider">Édition en cours</span>
+            <h2 class="text-3xl font-bold font-heading mt-2 mb-4 text-gray-800">
+              Édition {edition.annee}
+            </h2>
+
+            {edition.date_action && (
+              <p class="text-lg font-semibold text-rose-600 mb-3">
+                📅 {formatDate(edition.date_action)}
+              </p>
+            )}
+
+            {edition.montant_collecte && (
+              <div class="bg-rose-50 rounded-lg p-4 mb-4 inline-block">
+                <span class="text-3xl font-bold text-rose-600">
+                  {edition.montant_collecte.toLocaleString('fr-FR')} €
+                </span>
+                <span class="text-gray-600 ml-2">collectés</span>
+              </div>
+            )}
+
+            {edition.description && (
+              <p class="text-gray-600 leading-relaxed mb-6">
+                {blocksToText(edition.description)}
+              </p>
+            )}
+
+            {edition.partenaires && edition.partenaires.length > 0 && (
+              <div class="mt-6">
+                <span class="text-sm text-gray-500 uppercase tracking-wider font-semibold">Partenaires</span>
+                <div class="flex flex-wrap gap-4 mt-3 items-center">
+                  {edition.partenaires.map((p: any) => {
+                    const logoUrl = getImageUrl(p.logo);
+                    const inner = logoUrl ? (
+                      <img src={logoUrl} alt={p.nom} class="h-10 max-w-[120px] object-contain" title={p.nom} />
+                    ) : (
+                      <span>{p.nom}</span>
+                    );
+                    return p.url ? (
+                      <a href={p.url} target="_blank" rel="noopener noreferrer" class="bg-gray-50 border border-gray-200 px-4 py-2 rounded-lg hover:shadow-sm transition-shadow flex items-center gap-2 text-sm text-gray-700 hover:text-rose-600">
+                        {inner}
+                        {logoUrl && <span class="text-xs text-gray-400">{p.nom}</span>}
+                      </a>
+                    ) : (
+                      <span class="bg-gray-50 border border-gray-200 px-4 py-2 rounded-lg flex items-center gap-2 text-sm text-gray-700">
+                        {inner}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div class="text-center py-12">
+          <span class="text-6xl block mb-4">🌹</span>
+          <h2 class="text-2xl font-bold font-heading text-gray-800 mb-2">Prochaine édition à venir</h2>
+          <p class="text-gray-500">Les informations seront bientôt disponibles.</p>
+        </div>
+      )}
+    </div>
+  </section>
+
+  {/* ────────── DERNIÈRES ACTUALITÉS ────────── */}
   <section class="py-16 bg-gray-50">
     <div class="container mx-auto px-4">
       <h2 class="text-3xl font-bold font-heading mb-12 text-center text-gray-800">Dernières Actualités</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {[1, 2, 3].map((i) => (
-          <article class="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-            <div class="h-48 bg-gray-200"></div>
-            <div class="p-6">
-              <span class="text-xs font-bold text-rose-600 uppercase tracking-wider">Actualité</span>
-              <h3 class="text-xl font-bold mt-2 mb-2 font-heading">Titre de l'article {i}</h3>
-              <p class="text-gray-600 text-sm line-clamp-3">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-              </p>
-              <a href="#" class="inline-block mt-4 text-rose-600 font-medium hover:underline">Lire la suite &rarr;</a>
-            </div>
-          </article>
-        ))}
-      </div>
+      {articles.length > 0 ? (
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {articles.map((article: any) => (
+            <a href={`/actualites/${article.slug}`} class="group">
+              <article class="bg-white rounded-lg shadow-sm overflow-hidden group-hover:shadow-md transition-shadow h-full flex flex-col">
+                {getImageUrl(article.image) ? (
+                  <img src={getImageUrl(article.image)!} alt={article.titre} class="h-48 w-full object-cover" />
+                ) : (
+                  <div class="h-48 bg-gray-100 flex items-center justify-center text-gray-300">
+                    <span class="text-4xl">📰</span>
+                  </div>
+                )}
+                <div class="p-6 flex flex-col flex-grow">
+                  <span class="text-xs font-bold text-rose-600 uppercase tracking-wider">{article.categorie ?? 'Actualité'}</span>
+                  <h3 class="text-lg font-bold mt-2 mb-2 font-heading group-hover:text-rose-600 transition-colors">{article.titre}</h3>
+                  {article.date && (
+                    <p class="text-sm text-gray-400 mt-auto">{formatDate(article.date)}</p>
+                  )}
+                </div>
+              </article>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p class="text-center text-gray-500 py-12">
+          {strapiOnline ? "Aucune actualité pour le moment." : "⚠️ Impossible de charger les actualités. Vérifiez que le serveur est en ligne."}
+        </p>
+      )}
       <div class="text-center mt-12">
         <a href="/actualites" class="inline-block border-2 border-rose-600 text-rose-600 font-bold py-2 px-6 rounded-full hover:bg-rose-600 hover:text-white transition-colors">
           Toutes les actualités
@@ -83,4 +187,5 @@ try {
       </div>
     </div>
   </section>
+
 </Layout>

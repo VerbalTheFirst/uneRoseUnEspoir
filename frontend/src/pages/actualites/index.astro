@@ -1,12 +1,56 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import fetchApi from '../../lib/strapi';
+import { getImageUrl, formatDate } from '../../lib/helpers';
+
+// Fetch all published articles
+let articles: any[] = [];
+let strapiOnline = true;
+try {
+  articles = await fetchApi<any[]>({
+    endpoint: 'articles',
+    query: {
+      'sort': 'date:desc',
+      'populate': '*',
+    },
+    wrappedByKey: 'data',
+  }) ?? [];
+} catch (e) {
+  strapiOnline = false;
+}
 ---
 
 <Layout title="Actualités - Une Rose Un Espoir">
   <div class="container mx-auto px-4 py-12">
     <h1 class="text-4xl font-bold font-heading mb-8 text-rose-600">Actualités</h1>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <p>Liste des articles à venir...</p>
-    </div>
+
+    {articles.length > 0 ? (
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {articles.map((article: any) => (
+          <a href={`/actualites/${article.slug}`} class="group">
+            <article class="bg-white rounded-lg shadow-sm overflow-hidden group-hover:shadow-md transition-shadow h-full flex flex-col">
+              {getImageUrl(article.image) ? (
+                <img src={getImageUrl(article.image)!} alt={article.titre} class="h-48 w-full object-cover" />
+              ) : (
+                <div class="h-48 bg-gray-100 flex items-center justify-center text-gray-300">
+                  <span class="text-4xl">📰</span>
+                </div>
+              )}
+              <div class="p-6 flex flex-col flex-grow">
+                <span class="text-xs font-bold text-rose-600 uppercase tracking-wider">{article.categorie ?? 'Actualité'}</span>
+                <h3 class="text-lg font-bold mt-2 mb-2 font-heading group-hover:text-rose-600 transition-colors">{article.titre}</h3>
+                {article.date && (
+                  <p class="text-sm text-gray-400 mt-auto">{formatDate(article.date)}</p>
+                )}
+              </div>
+            </article>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <p class="text-center text-gray-500 py-12">
+        {strapiOnline ? "Aucune actualité publiée pour le moment." : "⚠️ Impossible de charger les actualités. Vérifiez que le serveur est en ligne."}
+      </p>
+    )}
   </div>
 </Layout>
