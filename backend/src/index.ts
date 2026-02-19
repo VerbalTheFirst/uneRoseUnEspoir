@@ -1,4 +1,5 @@
 import type { Core } from '@strapi/strapi';
+import { seedDemoData } from './seed';
 
 export default {
   /**
@@ -17,8 +18,12 @@ export default {
    * run jobs, or perform some special logic.
    */
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
-    strapi.log.info('--------------------------------------------------------------------------------');
-    strapi.log.info('REMINDER: Enable public permissions for Edition, Article, Galerie, Page, GlobalSetting in Admin Panel > Settings > Roles > Public.');
-    strapi.log.info('--------------------------------------------------------------------------------');
+    strapi.log.info('────────────────────────────────────────────────────────────────────');
+    strapi.log.info('REMINDER: Enable public permissions for Edition, Article, Galerie, Page, GlobalSetting');
+    strapi.log.info('         Admin Panel > Settings > Users & Permissions > Roles > Public');
+    strapi.log.info('────────────────────────────────────────────────────────────────────');
+
+    // Seed demo data if SEED=true
+    await seedDemoData(strapi);
   },
 };
