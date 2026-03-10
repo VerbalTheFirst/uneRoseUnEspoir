@@ -8,7 +8,7 @@ import { getImageUrl, formatDate } from '../../lib/helpers';
 let articles: any[] = [];
 let strapiOnline = true;
 try {
-  articles = await fetchApi<any[]>({
+  const all = await fetchApi<any[]>({
     endpoint: 'articles',
     query: {
       'sort': 'date:desc',
@@ -16,6 +16,8 @@ try {
     },
     wrappedByKey: 'data',
   }) ?? [];
+  // Only show articles that have a slug — articles without slug cause broken links
+  articles = all.filter((a: any) => a.slug);
 } catch (e) {
   strapiOnline = false;
 }
