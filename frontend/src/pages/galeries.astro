@@ -34,8 +34,20 @@ function getGalerieImages(galerie: any): { src: string; alt: string }[] {
 }
 
 function getYoutubeUrls(galerie: any): string[] {
-  if (!galerie.youtube_urls) return [];
-  if (Array.isArray(galerie.youtube_urls)) return galerie.youtube_urls;
+  const raw = galerie.youtube_urls;
+  if (!raw) return [];
+  // Already an array
+  if (Array.isArray(raw)) return raw.filter(Boolean);
+  // Plain string — single URL entered directly in the JSON field
+  if (typeof raw === 'string') {
+    const trimmed = raw.trim();
+    // Could be a JSON-encoded array string e.g. '["url1","url2"]'
+    if (trimmed.startsWith('[')) {
+      try { return JSON.parse(trimmed).filter(Boolean); } catch {}
+    }
+    // Single URL string
+    return trimmed ? [trimmed] : [];
+  }
   return [];
 }
 
