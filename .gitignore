@@ -20,3 +20,13 @@ build/
 
 # Helper
 .gemini/
+
+# claude
+.mcp.json
+
+# Database dumps
+*.dump
+*.sql.gz
+
+# Sample/local assets
+sample images URUE/
