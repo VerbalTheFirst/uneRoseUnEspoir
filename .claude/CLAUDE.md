@@ -24,14 +24,14 @@ Le site présente l'association, ses actions annuelles (collecte de fonds à mot
 | Hydration client | React | v19 (islands uniquement) |
 | Adapter deploy | @astrojs/vercel | v9.0.4 |
 | CMS headless | Strapi | v5.35.0 |
-| DB développement | SQLite | (better-sqlite3) |
+| DB développement | PostgreSQL via **Neon** (branche `dev`) | — |
 | DB production | PostgreSQL via **Neon** | — |
 | Email | Resend | v6.9.2 |
 | Images CDN | Cloudinary | conditionnel (si `CLOUDINARY_NAME` défini) |
 | Frontend deploy | **Vercel** | — |
 | Backend deploy | **Render.com** | — |
 
-**Note DB** : Migration Render PostgreSQL natif → **Neon** (PostgreSQL serverless) **terminée**. Attention : il n'existe pas encore d'environnement Neon séparé pour le dev — à créer (guide dans Notion URUE).
+**Note DB** : Migration Render PostgreSQL natif → **Neon** (PostgreSQL serverless) **terminée**. Branche Neon `dev` créée et configurée dans `backend/.env`. Branche `main` utilisée en prod (credentials dans les env vars Render).
 
 ---
 
@@ -154,14 +154,15 @@ Elles sont documentées en détail dans la page Notion privée du projet.
 
 ### Domaine & DNS
 - [x] Domaine custom décidé *(nom confidentiel — voir Notion)*
-- [ ] Registrar choisi et domaine acheté : ?
-- [ ] Date de renouvellement : ?
 
 ### Hébergement
-- [x] URL prod frontend (Vercel) : *(voir Notion)*
-- [ ] URL backend Strapi (Render) : ?
-- [ ] Détails Neon : URL de connexion, project ID, branche prod
-- [ ] Créer une branche Neon séparée pour le dev (guide dans Notion)
+- [x] URL prod frontend (Vercel) : https://une-rose-un-espoir.vercel.app
+- [x] URL backend Strapi (Render) : https://uneroseunespoir-back.onrender.com
+- [x] URL admin Strapi prod : https://uneroseunespoir-back.onrender.com/admin
+- [x] DB dev : Neon branche `dev` (connection string dans `backend/.env`)
+- [x] DB prod : Neon branche `main` (connection string dans les env vars Render)
+- [ ] Registrar choisi et domaine acheté : ?
+- [ ] Date de renouvellement domaine : ?
 
 ### Association
 - [ ] Membres impliqués dans le projet (noms, rôles) : ?
@@ -172,11 +173,12 @@ Elles sont documentées en détail dans la page Notion privée du projet.
 ### Développement
 - [x] Accès GitHub : mainteneur principal (repo public)
 - [x] Accès admin Strapi prod : mainteneur + 1 collaborateur dev
-- [ ] Environnement de staging : non (uniquement prod actuellement)
-- [ ] URL admin Strapi prod : ?
+- [x] Environnement de staging : non (uniquement prod actuellement)
+- [x] Workflow : dev sur branche `dev`, merge vers `main` déclenche les déploiements (Vercel + Render)
 
 ### Services tiers
 - [ ] Analytics : à décider
 - [ ] Email "from" Resend : domaine custom à configurer pour la prod
 - [ ] Email de l'asso pour recevoir les messages de contact : ?
-- [ ] Cloudinary account prod : ?
+- [x] Cloudinary : provider configuré dans `backend/config/plugins.ts`, uploads dans dossier `urue/`
+- [x] `STRAPI_URL` configuré dans les env vars Vercel (pointe sur Render)
