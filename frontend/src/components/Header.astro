@@ -24,11 +24,65 @@ const links = [
       ))}
     </nav>
 
-    <button class="md:hidden text-gray-700">
+    <button id="mobile-menu-toggle" class="md:hidden text-gray-700" aria-expanded="false" aria-controls="mobile-menu">
       <span class="sr-only">Menu</span>
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg id="icon-hamburger" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+      <svg id="icon-close" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
       </svg>
     </button>
   </div>
+
+  <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100">
+    <nav class="container mx-auto px-4 py-4 flex flex-col gap-4">
+      {links.map(link => (
+        <a href={link.href} class="text-gray-700 hover:text-rose-600 font-medium transition-colors py-1">
+          {link.text}
+        </a>
+      ))}
+    </nav>
+  </div>
 </header>
+
+<script>
+  const toggle = document.getElementById('mobile-menu-toggle');
+  const menu = document.getElementById('mobile-menu');
+  const iconHamburger = document.getElementById('icon-hamburger');
+  const iconClose = document.getElementById('icon-close');
+
+  function openMenu() {
+    menu?.classList.remove('hidden');
+    iconHamburger?.classList.add('hidden');
+    iconClose?.classList.remove('hidden');
+    toggle?.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('overflow-hidden');
+  }
+
+  function closeMenu() {
+    menu?.classList.add('hidden');
+    iconHamburger?.classList.remove('hidden');
+    iconClose?.classList.add('hidden');
+    toggle?.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('overflow-hidden');
+  }
+
+  toggle?.addEventListener('click', () => {
+    const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+    isOpen ? closeMenu() : openMenu();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMenu();
+  });
+
+  document.addEventListener('click', (e) => {
+    const header = document.querySelector('header');
+    if (!header?.contains(e.target as Node)) closeMenu();
+  });
+
+  menu?.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', closeMenu);
+  });
+</script>
