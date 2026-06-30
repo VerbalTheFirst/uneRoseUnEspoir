@@ -18,7 +18,6 @@ export default ({ env }) => [
   {
     name: 'strapi::cors',
     config: {
-      enabled: true,
       headers: '*',
       origin: [
         'http://localhost:4321',       // local dev
