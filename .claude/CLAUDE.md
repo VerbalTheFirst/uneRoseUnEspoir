@@ -158,7 +158,7 @@ Elles sont documentées en détail dans la page Notion privée du projet.
 ### Hébergement
 - [x] URL prod frontend (Vercel) : https://une-rose-un-espoir.vercel.app
 - [x] URL backend Strapi (Render) : https://uneroseunespoir-back.onrender.com
-- [x] URL admin Strapi prod : https://uneroseunespoir-back.onrender.com/admin
+- [x] URL admin Strapi prod *(non publiée — voir Notion)*
 - [x] DB dev : Neon branche `dev` (connection string dans `backend/.env`)
 - [x] DB prod : Neon branche `main` (connection string dans les env vars Render)
 - [ ] Registrar choisi et domaine acheté : ?
@@ -172,9 +172,9 @@ Elles sont documentées en détail dans la page Notion privée du projet.
 
 ### Développement
 - [x] Accès GitHub : mainteneur principal (repo public)
-- [x] Accès admin Strapi prod : mainteneur + 1 collaborateur dev
-- [x] Environnement de staging : non (uniquement prod actuellement)
-- [x] Workflow : dev sur branche `dev`, merge vers `main` déclenche les déploiements (Vercel + Render)
+- [x] Accès admin Strapi prod : restreint *(détail dans Notion)*
+- [x] Environnements et chaîne de déploiement *(détail dans Notion)*
+- [x] Workflow : développement sur branche `dev`, release via `main` (voir « Workflow Git » ci-dessus)
 
 ### Services tiers
 - [ ] Analytics : à décider

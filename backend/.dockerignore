@@ -1,0 +1,36 @@
+# Secrets — never ship these into the build context
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# VCS & tooling
+.git
+.gitignore
+.github
+.claude
+.vscode
+.idea
+
+# Dependencies & build artifacts (rebuilt inside the image)
+node_modules
+dist
+build
+.strapi
+.cache
+.tmp
+
+# Local uploads & logs
+public/uploads/*
+!public/uploads/.gitkeep
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker itself
+Dockerfile
+docker-compose.yml
+.dockerignore
