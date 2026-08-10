@@ -12,11 +12,22 @@ yarn-error.log*
 node_modules/
 dist/
 build/
+.tmp/
+
+# Environment — every variant is ignored, only the templates are tracked
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env.example
+
+# Keys & certificates
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
 
 # Helper
 .gemini/
